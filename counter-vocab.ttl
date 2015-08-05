@@ -1,0 +1,1103 @@
+@prefix counter: <http://vocab.ub.uni-leipzig.de/counter/> .
+@prefix rdf: <http://www.w3.org/1999/02/22-rdf-syntax-ns#> .
+@prefix rdfs: <http://www.w3.org/2000/01/rdf-schema#> .
+@prefix owl: <http://www.w3.org/2002/07/owl#> .
+@prefix dc: <http://purl.org/dc/elements/1.1/> .
+@prefix xsd: <http://www.w3c.org/2001/XMLSchema#> .
+@prefix doap: <http://usefulinc.com/ns/doap#> .
+@prefix foaf: <http://xmlns.com/foaf/0.1/> .
+@prefix vann: <http://purl.org/vocab/vann/> .
+
+
+<http://vocab.ub.uni-leipzig.de/counter/> a owl:Ontology ;
+	dc:title "COUNTER Usage Data Standard Vocabulary"@en , "COUNTER Nutzungsdatenstandard-Vokabular"@de ;
+	rdfs:comment "This vocabulary defines all Classes, Properties and Individuals needed to map a COUNTER 4.0 XML-formatted usage statistic to RDF."@en , 
+	"Dieses Vokabular definiert alle Klassen, Eigenschaften und Individuen, die benötigt werden, um eine nach COUNTER 4.0 XML-Standard formatierte Nutzungsstatistik in RDF abzubilden."@de ;
+	foaf:maker <http://aksw.org/Partner/AnnikaDomin> ;
+	doap:maintainer <http://aksw.org/Partner/AnnikaDomin> ;
+	vann:preferredNamespacePrefix "counter" ;
+    vann:preferredNamespaceUri "http://vocab.ub.uni-leipzig.de/counter/" ;
+    rdfs:seeAlso <http://www.projectcounter.org/> .
+
+	
+
+###########################
+# CLASSES, alphabetically #
+###########################
+
+counter:Category 
+	owl:equivalentClass [ a owl:class ;
+							owl:oneOf (
+								counter:Requests
+								counter:Searches
+								counter:AccessDenied	)
+						] ;
+	rdfs:label "catagory"@en, "Kategorie"@de ;
+	rdfs:comment "Class of categories measurable in a counting instance."@en, "Klasse der Kategorien der in einer Zähleinheit gemessenen Nutzung. "@de ;
+	rdfs:seeAlso <http://www.niso.org/schemas/sushi/counterElements4_0.xsd>, <http://www.niso.org/workrooms/sushi/values/> ;
+	rdfs:isDefinedBy <http://vocab.ub.uni-leipzig.de/counter/> .
+	
+counter:Consortium
+	a rdfs:Class ;
+	rdfs:label "consortium"@en, "Konsortium"@de ;
+	rdfs:comment "Class of consortia customers are organized in. Used for consortium reports."@en, "Klasse der Konsortien, an denen Kunden beteiligt sind. Bei Konsortialreports genutzt."@de ;
+	rdfs:isDefinedBy <http://vocab.ub.uni-leipzig.de/counter/> .
+	
+counter:Contact
+	a rdfs:Class ;
+	rdfs:label "contact"@en, "Kontakt"@de ;
+	rdfs:subClassOf 
+		[	a owl:restriction ;
+			owl:onProperty counter:hasEmail ;
+			owl:minCardinality "0"^^xsd:nonNegativeInteger;
+			owl:maxCardinality "1"^^xsd:nonNegativeInteger	] ;
+	rdfs:comment "Class of contacts."@en, "Klasse der Kontaktmöglichkeiten mit Kontaktdaten."@de ;
+	rdfs:isDefinedBy <http://vocab.ub.uni-leipzig.de/counter/> .
+	
+counter:CountingInstance
+	a owl:Class ;
+	rdfs:label "counting instance"@en, "Zählinstanz"@de ;
+	rdfs:subClassOf 
+		[	a owl:restriction ;
+			owl:onProperty counter:measuredForPeriod ;
+			owl:cardinality "1"^^xsd:nonNegativeInteger	] ,
+		[	a owl:restriction ;
+			owl:onProperty counter:hasCategory ;
+			owl:cardinality "1"^^xsd:nonNegativeInteger	] ,
+		[	a owl:restriction ;
+			owl:onProperty counter:hasMetricType ;
+			owl:cardinality "1"^^xsd:nonNegativeInteger	] ,
+		[	a owl:restriction ;
+			owl:onProperty counter:hasCount ;
+			owl:cardinality "1"^^xsd:nonNegativeInteger	] ,
+		[	a owl:restriction ;
+			owl:onProperty counter:considersPubYear ;
+			owl:minCardinality "0"^^xsd:nonNegativeInteger ;
+			owl:maxCardinality "1"^^xsd:nonNegativeInteger	] ,
+		[	a owl:restriction ;
+			owl:onProperty counter:wasCountedIn ;
+			owl:cardinality "1"^^xsd:nonNegativeInteger ] ,
+		[	a owl:restriction ;
+			owl:onProperty counter:refersToCustomer ;
+			owl:cardinality "1"^^xsd:nonNegativeInteger ] ;			
+	rdfs:comment "Class of counting instances. These are abstract images of instances of counting, representing the counting of a specific category and metric type for one report item during a specific period as well as the resulting count."@en, "Klasse der Zählinstanzen. Dies sind abstrakte Vorstellungen von Zähleinheiten, die die Zählung einer bestimmten Nutzungskategorie und Messgröße für einen Monat bei einem Reportelement sowie das Zählergebnis umfassen."@de ;
+	rdfs:isDefinedBy <http://vocab.ub.uni-leipzig.de/counter/> .
+	
+counter:Customer
+	a owl:Class ;
+	rdfs:subClassOf counter:Organization ;
+	rdfs:subClassOf [
+		a owl:restriction ;
+		owl:onProperty counter:receives ;
+		owl:minCardinality "1"^^xsd:nonNegativeInteger ] ;	
+	rdfs:label "customer"@en, "Kunde"@de ;
+	rdfs:comment "Class of customers whose data the reports represent. Only organizations can be customers."@en, "Klasse der Kunden, über deren Daten die Reports berichten. Nur Organisationen können Kunden sein."@de ;
+	rdfs:isDefinedBy <http://vocab.ub.uni-leipzig.de/counter/> .
+	
+counter:DateRange
+	a rdfs:Class ;
+	rdfs:label "date range"@en, "Zeitraum"@de ;
+	rdfs:subClassOf 
+		[	a owl:restriction ;
+			owl:onProperty counter:hasStartDay ;
+			owl:cardinality "1"^^xsd:nonNegativeInteger	] ,
+		[	a owl:restriction ;
+			owl:onProperty counter:hasEndDay ;
+			owl:cardinality "1"^^xsd:nonNegativeInteger	] ;	
+	rdfs:comment "Class of date ranges. Either counting periods of exactly one month or (for JR5 only) considered years of publication, beginning on Jan. 1 of the first, ending on Dec. 31 of the last year considered."@en, "Klasse der Zeiträume. Entweder der Messzeitraum, welcher immer einen Kalender-monat umfasst, oder der in Journal Report 5 berücksichtigten Zeitraum von Publikationsjahren einer Zeitschrift. Hier beginnt der Zeitraum am 1. Januar des ersten be-rücksichtigten Publikationsjahres und endet am 31.Dezember des letzten."@de ;
+	rdfs:isDefinedBy <http://vocab.ub.uni-leipzig.de/counter/> .	
+	
+counter:ItemDatatype
+	owl:equivalentClass [ a owl:class ;
+						owl:oneOf (
+							counter:Journal
+							counter:Database
+							counter:Platform
+							counter:Book
+							counter:Collection
+							counter:Multimedia ) 
+						] ;
+	rdfs:label "item data type"@en, "Medienart"@de ;
+	rdfs:comment "Class of item datatypes. They represent the sort of medium a report item is."@en,"Klasse der Datentypen von Reportelementen. Datentypen werden zur Beschreibung des Mediums des Elements genutzt."@de ;
+	rdfs:seeAlso <http://www.niso.org/schemas/sushi/counterElements4_0.xsd>, <http://www.niso.org/workrooms/sushi/values/> ;
+	rdfs:isDefinedBy <http://vocab.ub.uni-leipzig.de/counter/> .
+	
+counter:MetricType
+	owl:equivalentClass [ a owl:class ;
+	
+						owl:oneOf (
+							counter:ft_ps
+							counter:ft_ps_mobile
+							counter:ft_pdf
+							counter:ft_pdf_mobile
+							counter:ft_html
+							counter:ft_html_mobile
+							counter:ft_epub
+							counter:sectioned_html
+							counter:ft_total
+							counter:toc
+							counter:abstract
+							counter:reference
+							counter:data_set
+							counter:audio
+							counter:video
+							counter:image
+							counter:podcast
+							counter:multimedia
+							counter:record_view
+							counter:result_click
+							counter:search_reg
+							counter:search_fed
+							counter:turnaway
+							counter:no_license
+							counter:other )
+						] ;
+	rdfs:label "metric type"@en, "Messgröße"@de ;
+	rdfs:comment "Class of metric types countable. They define the kind of usage measured in a report, fifferentiating in e.g. HTML full text requests and turnaways due to license problems."@en, "Klasse der zählbaren Messgrößen. Diese definieren, welche Art von Nutzung gemessen wird, beispielsweise Volltextabrufe im HTML-Format oder Abweisungen aufgrund von fehlenden Lizenzen."@de ;
+	rdfs:seeAlso <http://www.niso.org/schemas/sushi/counterElements4_0.xsd>, <http://www.niso.org/workrooms/sushi/values/> ;
+	rdfs:isDefinedBy <http://vocab.ub.uni-leipzig.de/counter/> .
+	
+counter:Organization 
+	a rdfs:Class ;
+	rdfs:label "organization"@en, "Organisation"@de ;
+	rdfs:comment "Class of organizations. No Instances intended, only used as superclass of Vendor and Customer."@en, "Klasse der Organisationen. Keine Instanzen dieser Klasse vorgesehen, sondern reine Oberklasse von Vendor und Customer"@de ;
+	rdfs:isDefinedBy <http://vocab.ub.uni-leipzig.de/counter/> .
+	
+	
+counter:Platform
+	a rdfs:Class ;
+	rdfs:label "platform"@en, "Plattform"@de ;
+	rdfs:comment "Class of platforms hosting the content. They are represented by the online hosts's name in the form used by the vendor, e.g. EBSCOhost."@en, "Klasse der Plattformen, auf denen die lizenzierten Daten zur Nutzung angeboten werden. Bezeichnung durch den Namen dieses Online-Hosts in der durch den Serviceanbieter genutzten Form. Beispiel: EBSCOhost."@de ;
+	rdfs:isDefinedBy <http://vocab.ub.uni-leipzig.de/counter/> .
+	
+counter:Publisher
+	a rdfs:Class ;
+	rdfs:label "publisher"@en, "Verleger"@de ;
+	rdfs:comment "Class of report item publishers of ."@en, "Klasse der Verleger von Reportelementen."@de ;
+	rdfs:isDefinedBy <http://vocab.ub.uni-leipzig.de/counter/> .
+	
+counter:Report
+	a owl:Class ;
+	rdfs:label "report"@en, "Report"@de ;
+	rdfs:subClassOf 
+		[	a owl:restriction ;
+			owl:onProperty counter:wasCreatedOn ;
+			owl:minCardinality "0"^^xsd:nonNegativeInteger ;
+			owl:maxCardinality "1"^^xsd:nonNegativeInteger	] ,
+		[	a owl:restriction ;
+			owl:onProperty counter:hasReportTitle ;
+			owl:minCardinality "0"^^xsd:nonNegativeInteger ;
+			owl:maxCardinality "1"^^xsd:nonNegativeInteger	] ,
+		[	a owl:restriction ;
+			owl:onProperty counter:hasReportVersion ;
+			owl:minCardinality "0"^^xsd:nonNegativeInteger ;
+			owl:maxCardinality "1"^^xsd:nonNegativeInteger	] ,
+		[	a owl:restriction ;
+			owl:onProperty counter:hasReportID ;
+			owl:cardinality "1"^^xsd:nonNegativeInteger ] ;			
+	rdfs:comment "Class of individual COUNTER Reports."@en, "Klasse der einzelnen COUNTER-Reports."@de ;
+	rdfs:isDefinedBy <http://vocab.ub.uni-leipzig.de/counter/> .
+	
+counter:ReportItem
+	a owl:Class ;
+	rdfs:label "report item"@en, "Reportelement"@de ;
+	rdfs:subClassOf 
+		[	a owl:restriction ;
+			owl:onProperty counter:hasItemDatatype ;
+			owl:cardinality "1"^^xsd:nonNegativeInteger	] ,
+		[ 	a owl:restriction ;
+			owl:onProperty counter:hasPerformance ;
+			owl:minCardinality "1"^^xsd:nonNegativeInteger	] ,	
+		[ 	a owl:restriction ;
+			owl:onProperty counter:isContainedIn ;
+			owl:minCardinality "1"^^xsd:nonNegativeInteger	] ,
+		[ 	a owl:restriction ;
+			owl:onProperty counter:CounterRepresentedMedium ;
+			owl:cardinality "1"^^xsd:nonNegativeInteger ] ;			
+	rdfs:comment "Class of report items. They are representations of the individual e-resources whose usage is reported. Report items mirror the real resources based only on COUNTER report data."@en, "Klasse der Reportelemente. Dies sind Repräsentationen der einzelnen Ressourcen, über deren Nutzung im Report berichtet wird. Reportelemente sind eine Art Spiegelbild der echten Ressourcen, die nur auf Grundlage von Daten aus COUNTER-Reports entstehen. Anknüpfungspunkt zu den anderen Teilen des ERM."@de ;
+	rdfs:isDefinedBy <http://vocab.ub.uni-leipzig.de/counter/> .
+	
+counter:ReportTitle
+	owl:equivalentClass [ a owl:class ;
+						owl:oneOf (
+							counter:BR1
+							counter:BR2
+							counter:BR3
+							counter:BR4
+							counter:BR5
+							counter:CR1
+							counter:CR2
+							counter:CR3
+							counter:DB1
+							counter:DB2
+							counter:JR1
+							counter:JR1GOA
+							counter:JR1a
+							counter:JR2
+							counter:JR3
+							counter:JR3mobile
+							counter:JR4
+							counter:JR5
+							counter:MR1
+							counter:MR2
+							counter:PR1
+							counter:TR1
+							counter:TR1mobile
+							counter:TR2
+							counter:TR3
+							counter:TR3mobile )
+						] ;
+	rdfs:label "report title"@en, "Reportbezeichnung"@de ;
+	rdfs:comment "Class of report titles. Not the reports themselves but only their names which are indicating the type of a report."@en, "Klasse der Bezeichnungen der Reports. Explizit nicht die Reports selbst, sondern deren den Inhalt bestimmenden Bezeichnungen."@de ;
+	rdfs:seeAlso <http://www.niso.org/workrooms/sushi/reports/> ;
+	rdfs:isDefinedBy <http://vocab.ub.uni-leipzig.de/counter/> .
+	
+counter:Vendor
+ 	a rdfs:Class ;
+	rdfs:subClassOf counter:Organization ;
+	rdfs:subClassOf [
+		a owl:restriction ;
+		owl:onProperty counter:creates ;
+		owl:minCardinality "1"^^xsd:nonNegativeInteger ] ;	
+	rdfs:label "vendor"@en, "Datenanbieter"@de ;
+	rdfs:comment "Class of vendors. Only organizations can be vendors."@en, "Klasse der Datenanbieter, die die Reports erstellen. Nur Organisationen können Da-tenanbieter sein."@de ;
+	rdfs:isDefinedBy <http://vocab.ub.uni-leipzig.de/counter/> .
+
+
+	
+#########################################
+# PROPERTIES, alphabeticaly #
+#########################################
+
+counter:considersPubYear
+	a owl:ObjectProperty ;
+	rdfs:label "considers the publication year range"@en, "berücksichtigt den Publikationszeitraum"@de ;
+	rdfs:comment "Links the range of considered publication years of a journal, representing one or several years. Only used in Journal Report 5."@en, "Verknüpft den Zeitraum von bei der Messung berücksichtigten Publikationsjahren einer Zeitschrift, ein oder mehrere Jahre umfassend. Nur in Journal Report 5 verwendet."@de ;
+	rdfs:isDefinedBy <http://vocab.ub.uni-leipzig.de/counter/> ;
+	rdfs:domain counter:CountingInstance ;
+	rdfs:range counter:DateRange .	
+	
+counter:CounterRepresentedMedium
+	a owl:ObjectProperty ;
+	rdfs:label " medium represented by the report item"@en, " durch das Reportelement repräsentiertes Medium"@de ;
+	rdfs:comment "Links the medium that is represented by the report item to report on its usage. Connecting link to the other parts of the ERMS."@en, "Verknüpft das Medium, das durch das Reportelement repräsentiert wird, um seine Nutzung zu berichten. Anknüpfungspunkt an die anderen Teile des ERMS."@de ;
+	rdfs:isDefinedBy <http://vocab.ub.uni-leipzig.de/counter/> ;
+	rdfs:domain counter:ReportItem .
+		
+counter:creates
+	a owl:ObjectProperty ;
+	rdfs:label "creates"@en, "erstellt"@de ;
+	rdfs:comment "Links the COUNTER report which the vendor creates."@en, "Verknüpft den COUNTER Report, den der Datenanbieter erstellt."@de ;
+	rdfs:isDefinedBy <http://vocab.ub.uni-leipzig.de/counter/> ;
+	rdfs:domain counter:Customer ;
+	rdfs:range counter:Report .	
+							
+counter:hasConsortiumCode
+	a owl:DatatypeProperty ;
+	rdfs:label "has the code"@en, "hat den Code"@de ;
+	rdfs:comment "Links the abbreviation or code that identifies the consortium. To be used in a reificated statement, at most once per report."@en, "Verknüpft die Abkürzung oder den Code, der das Konsortium identifiziert. Anzuwenden in reifizierter Aussage unter Angabe des Quellreports. Höchstens einmal pro Report zu verwenden."@de ;
+	rdfs:isDefinedBy <http://vocab.ub.uni-leipzig.de/counter/> ;
+	rdfs:domain counter:Consortium ;
+	rdfs:range xsd:string .
+	
+counter:hasConsortiumName
+	a owl:DatatypeProperty ;
+	rdfs:label "has well known name"@en, "ist bekannt unter dem Namen"@de ;
+	rdfs:comment "Links the well known name of the consortium. To be used in a reificated statement, exactly once per report."@en, "Verknüpft den Namen, unter dem das Konsortium bekannt ist. Anzuwenden in reifizierter Aussage unter Angabe des Quellreports. Genau einmal pro Report zu verwenden."@de ;
+	rdfs:isDefinedBy <http://vocab.ub.uni-leipzig.de/counter/> ;
+	rdfs:domain counter:Consortium ;
+	rdfs:range xsd:string .
+
+counter:hasContact
+	a owl:ObjectProperty ;
+	rdfs:label "has the contact"@en, "hat den Kontakt"@de ;
+	rdfs:comment "Links the contact (person) in an organization. To be used in a reificated statement."@en, "Verknüpft den Kontakt bzw. die Kontaktperson in einer Organisation. Anzuwenden in reifizierter Aussage unter Angabe des Quellreports."@de ;
+	rdfs:isDefinedBy <http://vocab.ub.uni-leipzig.de/counter/> ;
+	rdfs:domain counter:Organization ;
+	rdfs:range counter:Contact .
+	
+counter:hasContactName
+	a owl:DatatypeProperty ;
+	rdfs:label "has the name"@en, "hat den Namen"@de ;
+	rdfs:comment "Links the name of the contact. To be used in a reificated statement, at most once per report."@en, "Verknüpft den Namen des Kontaktes bzw. der Kontaktperson. Anzuwenden in reifizierter Aussage unter Angabe des Quellreports. Höchstens einmal pro Report zu verwenden."@de ;
+	rdfs:isDefinedBy <http://vocab.ub.uni-leipzig.de/counter/> ;
+	rdfs:domain counter:Contact ;
+	rdfs:range xsd:string .	
+
+counter:hasCount
+	a owl:DatatypeProperty ;
+	rdfs:label "has the count"@en, "hat den Zählwert"@de ;
+	rdfs:comment "Links the specific count."@en, "Verknüpft den konkreten Zählwert."@de ;
+	rdfs:isDefinedBy <http://vocab.ub.uni-leipzig.de/counter/> ;
+	rdfs:domain counter:CountingInstance ;
+	rdfs:range xsd:nonNegativeInteger .
+	
+counter:hasDOI
+	a owl:ObjectProperty ;
+	rdfs:label "has the DOI"@en, "hat den DOI"@de ;
+	rdfs:comment "Links the DOI of a resource."@en, "Verknüpft den DOI einer Ressource."@de ;
+	rdfs:isDefinedBy <http://vocab.ub.uni-leipzig.de/counter/> ;
+	rdfs:domain counter:ReportItem .
+	
+counter:hasEmail
+	a owl:ObjectProperty ;
+	rdfs:label "has the email address"@en, "hat die E-Mail-Adresse"@de ;
+	rdfs:comment "Links the email address of the contact."@en, "Verknüpft die E-Mail-Adresse des Kontaktes."@de ;
+	rdfs:isDefinedBy <http://vocab.ub.uni-leipzig.de/counter/> ;
+	rdfs:domain counter:Contact .	
+	
+counter:hasEndDay
+	a owl:DatatypeProperty ;
+	rdfs:label "ends on day"@en, "endet am Tag"@de ;
+	rdfs:comment "Links the last day of a time period."@en, "Verknüpft den letzten Tag eines Zeitraumes."@de ;
+	rdfs:isDefinedBy <http://vocab.ub.uni-leipzig.de/counter/> ;
+	rdfs:domain counter:DateRange ;
+	rdfs:range xsd:date .
+	
+counter:hasFullTitle
+	a owl:DatatypeProperty ;
+	rdfs:label "has the full title"@en, "hat die Vollbezeichnung"@de ;
+	rdfs:comment "Links the full COUNTER report name, e.g. Journal Report 1 to the short title that is related to the report."@en, "Verknüpft den Titel eines COUNTER-Reports, z. B. Journal Report 1, mit der Kurzbezeichnung, die mit dem Report verbunden ist."@de ;
+	rdfs:seeAlso <http://www.niso.org/workrooms/sushi/reports/> ;
+	rdfs:isDefinedBy <http://vocab.ub.uni-leipzig.de/counter/> ;
+	rdfs:domain counter:ReportTitle ;
+	rdfs:range xsd:string .		
+	
+counter:hasInstitutionalIdentifier
+	a rdf:Property ;
+	rdfs:label "has institutional identifier"@en, "hat Insititutionsidentifikator"@de ;
+	rdfs:comment "Links any known standard identifier that identifies the customer. Valid object resources will be predefined. Not yet used."@en, "Verknüpft  Standardidentifikatoren, die den Kunden identifizieren. Zulässige Objektressourcen werden noch vordefiniert. Momentan noch nicht verwendet."@de ;
+	rdfs:seeAlso <http://www.niso.org/schemas/sushi/counterElements4_0.xsd>, <http://www.niso.org/workrooms/sushi/values/> ;					
+	rdfs:isDefinedBy <http://vocab.ub.uni-leipzig.de/counter/> ;
+	rdfs:domain counter:Customer .
+	
+counter:hasItemDatatype
+	a owl:ObjectProperty ;
+	rdfs:label "has the item datatype"@en, "hat den Element-Datentyp"@de ;
+	rdfs:comment "Links the data type describing the nature of the report item, e. g. journal. Valid object resources are predefined."@en, "Verknüpft den Datentyp des Elements, der dessen Art beschreibt, z. B. Journal. Zulässige Objektressourcen sind vordefiniert."@de ;
+	rdfs:seeAlso <http://www.niso.org/schemas/sushi/counterElements4_0.xsd>, <http://www.niso.org/workrooms/sushi/values/> ;
+	rdfs:isDefinedBy <http://vocab.ub.uni-leipzig.de/counter/> ;
+	rdfs:domain counter:ReportItem ;
+	rdfs:range counter:ItemDatatype .								
+
+counter:hasItemName
+	a owl:DatatypeProperty ;
+	rdfs:label "has the item name"@en, "hat den Namen"@de ;
+	rdfs:comment "Links the name of the item, e.g . journal title. To be used in a reificated statement, exactly once per report."@en, "Verknüpft die Bezeichnung des Elementes, z. B. den Titel der Zeitschrift. Anzuwenden in reifizierter Aussage unter Angabe des Quellreports. Genau einmal pro Report zu verwenden."@de ;
+	rdfs:isDefinedBy <http://vocab.ub.uni-leipzig.de/counter/> ;
+	rdfs:domain counter:ReportItem ;
+	rdfs:range xsd:string .
+	
+counter:hasLicensee
+	a owl:ObjectProperty ;
+	rdfs:label "has the licensee"@en, "hat den Lizenznehmer"@de ;
+	rdfs:comment "Links the licensee (customer) to an specific report item.	To be used in a reificated statement, at least once per report. Several customers may be linked in consortium reports."@en, "Verknüpft den Lizenznehmer (Kunden) mit einem spezifischen Element des Reports. Anzuwenden in reifizierter Aussage unter Angabe des Quellreports. Mindestens einmal pro Report zu verwenden, mehrere Kunden können beispielsweise in Konsortialreports verknüpft werden."@de ;
+	rdfs:isDefinedBy <http://vocab.ub.uni-leipzig.de/counter/> ;
+	rdfs:domain counter:ReportItem ;
+	rdfs:range counter:Customer .							
+	
+counter:hasLicensor
+	a owl:ObjectProperty ;
+	rdfs:label "has the licensor"@en, "hat den Lizenzgeber"@de ;
+	rdfs:comment "Links the licensor (vendor) to an specific report item. To be used in a reificated statement, exactly once per report."@en, "Verknüpft den Lizenzgeber (Datenanbieter) mit einem spezifischen Element des Reports. Anzuwenden in reifizierter Aussage unter Angabe des Quellreports. Genau einmal pro Report zu verwenden."@de ;
+	rdfs:isDefinedBy <http://vocab.ub.uni-leipzig.de/counter/> ;
+	rdfs:domain counter:ReportItem ;
+	rdfs:range counter:Vendor .
+	
+counter:hasLogoURL
+	a owl:ObjectProperty ;
+	rdfs:label "has the logo url"@en, "hat die Logo-URL"@de ;
+	rdfs:comment "Links the URL of an organization logo. To be used in a reificated statement, at most once per report."@en, "Verknüpft die URL eines Organisations-Logos. Anzuwenden in reifizierter Aussage unter Angabe des Quellreports. Höchstens einmal pro Report zu verwenden."@de ;
+	rdfs:isDefinedBy <http://vocab.ub.uni-leipzig.de/counter/> ;
+	rdfs:domain counter:Organization .
+	
+counter:hasMetricType
+	a owl:ObjectProperty ;
+	rdfs:label "has the metric type"@en, "hat die Messgröße"@de ;
+	rdfs:comment "Links the metric type counted, differentiates e.g. between  HTML and PDF full texts. Valid object resources are predefined."@en, "Verknüpft die gezählte Messgröße, unterscheidet u. a. zwischen HTML- und PDF-Volltexten. Zulässige Objektressourcen sind vordefiniert."@de ;
+	rdfs:seeAlso <http://www.niso.org/schemas/sushi/counterElements4_0.xsd>, <http://www.niso.org/workrooms/sushi/values/> ;
+	rdfs:isDefinedBy <http://vocab.ub.uni-leipzig.de/counter/> ;
+	rdfs:domain counter:CountingInstance ;
+	rdfs:range counter:MetricType .
+	
+counter:hasOnlineISBN
+	a owl:ObjectProperty ;
+	rdfs:label "has the online ISBN"@en, "hat die Online-ISBN"@de ;
+	rdfs:comment "Links the ISBN of the online version of a book."@en, "Verknüpft die ISBN der digitalen Ausgabe eines Buches."@de ;
+	rdfs:isDefinedBy <http://vocab.ub.uni-leipzig.de/counter/> ;
+	rdfs:domain counter:ReportItem .
+
+counter:hasOnlineISSN
+	a owl:ObjectProperty ;
+	rdfs:label "has the online ISSN"@en, "hat die Online-ISSN"@de ;
+	rdfs:comment "Links the ISSN of the online version of a serial."@en, "Verknüpft die ISSN der digitalen Ausgabe einer Schriftenreihe."@de ;
+	rdfs:isDefinedBy <http://vocab.ub.uni-leipzig.de/counter/> ;
+	rdfs:domain counter:ReportItem .	
+	
+counter:hasOrganizationID
+	a owl:DatatypeProperty ;
+	rdfs:label "has the organization ID"@en, "hat die Organisations-ID"@de ;
+	rdfs:comment "Links an identifier by which an organization is known to the content provider, as used by the content provider. To be used in a reificated statement, exactly once per report."@en, "Verknüpft einen Identifikator, unter dem eine Organisation dem Inhaltsanbieter bekannt ist, in der von diesem genutzten Form. Anzuwenden in reifizierter Aussage unter Angabe des Quellreports. Genau einmal pro Report zu verwenden."@de ;
+	rdfs:isDefinedBy <http://vocab.ub.uni-leipzig.de/counter/> ;
+	rdfs:domain counter:Organization ;
+	rdfs:range xsd:string .
+	
+counter:hasOrganizationName
+	a owl:DatatypeProperty ;
+	rdfs:label "has the organization name"@en, "hat den Organisationsamen"@de ;
+	rdfs:comment "Links the name of an organization. To be used in a reificated statement, at most once per report."@en, "Verknüpft den Namen einer Organisation. Anzuwenden in reifizierter Aussage unter Angabe des Quellreports. Höchstens einmal pro Report zu verwenden."@de ;
+	rdfs:isDefinedBy <http://vocab.ub.uni-leipzig.de/counter/> ;
+	rdfs:domain counter:Organization ;
+	rdfs:range xsd:string .
+	
+counter:hasPerformance
+	a owl:ObjectProperty ;
+	rdfs:label "has the performance"@en, "hat das Ergebnis "@de ;
+	rdfs:comment "Links the set of statistics representing one category of usage for the period of one month."@en, "Verknüpft die Statistiken, die eine Nutzungskategorie für einen Zeitraum von einem Monat abbilden."@de ;
+	rdfs:isDefinedBy <http://vocab.ub.uni-leipzig.de/counter/> ;
+	rdfs:domain counter:ReportItem ;
+	rdfs:range counter:CountingInstance .
+	
+counter:hasPrintISBN
+	a owl:ObjectProperty ;
+	rdfs:label "has the print ISBN"@en, "hat die Print-ISBN"@de ;
+	rdfs:comment "Links the ISBN of a printed book."@en,"Verknüpft die ISBN eines gedruckten Buches."@de ;
+	rdfs:isDefinedBy <http://vocab.ub.uni-leipzig.de/counter/> ;
+	rdfs:domain counter:ReportItem .
+	
+counter:hasPrintISSN
+	a owl:ObjectProperty ;
+	rdfs:label "has the print ISSN"@en, "hat die Print-ISSN"@de ;
+	rdfs:comment "Links the ISSN of the print version of a serial."@en, "Verknüpft die ISSN der Printausgabe einer Schriftenreihe."@de ;
+	rdfs:isDefinedBy <http://vocab.ub.uni-leipzig.de/counter/> ;
+	rdfs:domain counter:ReportItem .
+
+counter:hasProprietaryID
+	a owl:DatatypeProperty ;
+	rdfs:label "has the proprietary ID"@en, "hat die proprietäre ID"@de ;
+	rdfs:comment "Links the proprietary ID of a resource, as used by the vendor"@en, "Verknüpft die proprietäre ID einer Ressource, wie sie intern vom Datenanbieter verwendet wird."@de ;
+	rdfs:isDefinedBy <http://vocab.ub.uni-leipzig.de/counter/> ;
+	rdfs:domain counter:ReportItem ;
+	rdfs:range xsd:string .			
+		
+counter:hasReportID
+	a owl:DatatypeProperty ;
+	rdfs:label "has the report ID"@en, "hat die Report-ID"@de ;
+	rdfs:comment "Links an identifier of the report as assigned by the application creating the message, for tracking purposes."@en, "Verknüpft eine von der die Nachricht erstellenden Anwendung vergebene Report-ID, zu Trackingzwecken."@de ;
+	rdfs:isDefinedBy <http://vocab.ub.uni-leipzig.de/counter/> ;
+	rdfs:domain counter:Report ;
+	rdfs:range xsd:string.
+
+counter:hasReportTitle
+	a owl:ObjectProperty ;
+	rdfs:label "has the report name"@en, "hat die Bezeichnung"@de ;
+	rdfs:comment "Links the name of the report."@en, "Verknüpft die Bezeichnung des Reports."@de ;
+	rdfs:isDefinedBy <http://vocab.ub.uni-leipzig.de/counter/> ;
+	rdfs:domain counter:Report ;
+	rdfs:range counter:ReportTitle .
+	
+counter:hasReportVersion
+	a owl:DatatypeProperty ;
+	rdfs:label "has the report version"@en, "hat Reportversion"@de ;
+	rdfs:comment "Links the version of the COUNTER report."@en, "Verknüpft die Version des COUNTER-Reports."@de ;
+	rdfs:isDefinedBy <http://vocab.ub.uni-leipzig.de/counter/> ;
+	rdfs:domain counter:Report ;
+	rdfs:range xsd:string .	
+	
+counter:hasStartDay
+	a owl:DatatypeProperty ;
+	rdfs:label "begins on day"@en, "beginnt am Tag"@de ;
+	rdfs:comment "Links the first day of a time period."@en, "Verknüpft den ersten Tag eines Zeitraumes."@de ;
+	rdfs:isDefinedBy <http://vocab.ub.uni-leipzig.de/counter/> ;
+	rdfs:domain counter:DateRange ;
+	rdfs:range xsd:date .
+
+counter:hasSourceReport
+	a owl:ObjectProperty ;
+	rdfs:label "was taken from the source report"@en, "stammt aus dem Quellreport"@de ;
+	rdfs:comment "Links the report the information was taken from to the data."@en, "Verknüpft den Quellreport, aus dem die Informationen entnommen wurden, mit den jeweiligen Daten."@de ;
+	rdfs:isDefinedBy <http://vocab.ub.uni-leipzig.de/counter/> ;
+	rdfs:range counter:Report .
+	
+counter:hasWebsiteURL
+	a owl:ObjectProperty ;
+	rdfs:label "has the website url"@en, "hat die Website-URL"@de ;
+	rdfs:comment "Links the URL of an organization website. To be used in a reificated statement, at most once per report."@en, "Verknüpft die URL einer Organisations-Website. Anzuwenden in reifizierter Aussage unter Angabe des Quellreports. Höchstens ein-mal pro Report zu verwenden."@de ;
+	rdfs:isDefinedBy <http://vocab.ub.uni-leipzig.de/counter/> ;
+	rdfs:domain counter:Organization .
+	
+counter:isAccessibleVia
+	a owl:ObjectProperty ;
+	rdfs:label "is accessible via"@en, "ist zugänglich über"@de ;
+	rdfs:comment "Links the platform, i.e. the name of the online host as determined by the service provider, e.g. EBSCOhost. To be used in a reificated statement, exactly once per report."@en, "Verknüpft die Plattform, d. h. den Namen des Online-Hosts in der durch den Serviceanbieter genutzten Form, z. B. EBSCOhost. Anzuwenden in reifizierter Aussage unter Angabe des Quellreports. Genau einmal pro Report zu verwenden."@de ;
+	rdfs:isDefinedBy <http://vocab.ub.uni-leipzig.de/counter/> ;
+	rdfs:domain counter:ReportItem ;
+	rdfs:range counter:Platform .
+	
+counter:isContainedIn
+	a owl:ObjectProperty ;
+	rdfs:label "is contained in"@en, "ist enthalten in"@de ;
+	rdfs:comment "Links the COUNTER report which contains the report item."@en, "Verknüpft COUNTER report, der das Reportelement enthält."@de ;
+	rdfs:isDefinedBy <http://vocab.ub.uni-leipzig.de/counter/> ;
+	rdfs:domain counter:ReportItem ;
+	rdfs:range counter:Report .	
+	
+counter:isPartOfConsortium
+	a owl:ObjectProperty ;
+	rdfs:label "is part of consortium"@en, "ist Teil des Konsortiums"@de ;
+	rdfs:comment "Links the consortium the customer is part of. For consortium reports. To be used in a reificated statement, at most once per report."@en, "Verknüpft das Konsortium, an dem der Kunde beteiligt ist. Für Konsortialreports. Anzuwenden in reifizierter Aussage unter Angabe des Quellreports. Höchstens einmal pro Report zu verwenden."@de ;
+	rdfs:isDefinedBy <http://vocab.ub.uni-leipzig.de/counter/> ;
+	rdfs:domain counter:Customer ;
+	rdfs:range counter:Consortium .
+	
+counter:measuredForPeriod
+	a owl:ObjectProperty ;
+	rdfs:label "was measured for period"@en, "gemessen für den Zeitraum"@de;
+	rdfs:comment "Links the date range the usage was counted in"@en, "Verknüpft den Zeitraum, während dem die Nutzung gemessen wurde."@de ;
+	rdfs:isDefinedBy <http://vocab.ub.uni-leipzig.de/counter/> ;
+	rdfs:domain counter:CountingInstance ;
+	rdfs:range counter:DateRange .
+	
+counter:measuresCategory
+	a owl:ObjectProperty ;
+	rdfs:label "measures catagory"@en, "misst die Kategorie"@de ;
+	rdfs:comment "Links the catagory of usage that was measured in this counting instance.Valid object resources are predefined."@en, "Verknüpft die in dieser Zähleinheit gemessene Nutzungskategorie. Zulässige Objektressourcen sind vordefiniert."@de ;
+	rdfs:seeAlso <http://www.niso.org/schemas/sushi/counterElements4_0.xsd>, <http://www.niso.org/workrooms/sushi/values/> ;
+	rdfs:isDefinedBy <http://vocab.ub.uni-leipzig.de/counter/> ;
+	rdfs:domain counter:CountingInstance ;
+	rdfs:range counter:Category .	
+
+counter:receives
+	a owl:ObjectProperty ;
+	rdfs:label "receives"@en, "erhält"@de ;
+	rdfs:comment "Links the COUNTER report which the customer receives."@en, "Verknüpft den COUNTER Report, den der Kunde erhält."@de ;
+	rdfs:isDefinedBy <http://vocab.ub.uni-leipzig.de/counter/> ;
+	rdfs:domain counter:Customer ;
+	rdfs:range counter:Report .
+	
+counter:refersToCustomer
+	a owl:ObjectProperty ;
+	rdfs:label "refers to the customer"@en, "bezieht sich auf den Kunden"@de ;
+	rdfs:comment "Links the customer, the measured usage data refers to. Important due to the possibility of several customers per report."@en, "Verknüpft den Kunden, auf den sich die gemessenen Nutzungsdaten beziehen. Wichtig wegen der Möglichkeit mehrerer Kunden in einem Report."@de ;
+	rdfs:isDefinedBy <http://vocab.ub.uni-leipzig.de/counter/> ;
+	rdfs:domain counter:CountingInstance ;
+	rdfs:range counter:Customer .
+	
+counter:wasCountedIn
+	a owl:ObjectProperty ;
+	rdfs:label "was counted in"@en, "wurde gezählt in"@de ;
+	rdfs:comment "Links the COUNTER report containing this counting instance."@en, "Verknüpft den diese Zählinstanz beinhaltenden COUNTER Report."@de ;
+	rdfs:isDefinedBy <http://vocab.ub.uni-leipzig.de/counter/> ;
+	rdfs:domain counter:CountingInstance ;
+	rdfs:range counter:Report .
+	
+counter:wasCreatedOn
+	a owl:DatatypeProperty ;
+	rdfs:label "was created on"@en, "wurde erstellt am"@de ;
+	rdfs:comment "Links the date and time the report was created."@en, "Verknüpft Datum und Uhrzeit, zu der der Report erstellt wurde."@de ;
+	rdfs:isDefinedBy <http://vocab.ub.uni-leipzig.de/counter/> ;
+	rdfs:domain counter:Report ;
+	rdfs:range xsd:dateTime .
+							
+counter:wasPublishedBy
+	a owl:ObjectProperty ;
+	rdfs:label "was published by"@en, "wurde publiziert von"@de ;
+	rdfs:comment "Links the publisher of an item. To be used in a reificated statement, at most once per report."@en, "Verknüpft den Verleger eines Reportelements. Anzuwenden in reifizierter Aussage unter Angabe des Quellreports. Höchstens einmal pro Report zu verwenden."@de ;
+	rdfs:isDefinedBy <http://vocab.ub.uni-leipzig.de/counter/> ;
+	rdfs:domain counter:ReportItem ;
+	rdfs:range counter:Publisher .
+
+	
+
+#########################################
+# Instances, by type, alphabetically #
+#########################################	
+
+# Category
+	
+counter:Requests
+	a counter:Category ;
+	rdfs:label "requests"@en, "Anfragen"@de ;
+	rdfs:seeAlso <http://www.niso.org/schemas/sushi/counterElements4_0.xsd>, <http://www.niso.org/workrooms/sushi/values/> ;
+	rdfs:isDefinedBy <http://vocab.ub.uni-leipzig.de/counter/> .
+
+counter:Searches
+	a counter:Category ;
+	rdfs:label "searches"@en, "Suchvorgänge"@de  ;
+	rdfs:seeAlso <http://www.niso.org/schemas/sushi/counterElements4_0.xsd>, <http://www.niso.org/workrooms/sushi/values/> ;
+	rdfs:isDefinedBy <http://vocab.ub.uni-leipzig.de/counter/> .
+
+counter:AccessDenied
+	a counter:Category ;
+	rdfs:label "access denied"@en, "Zugriff verweigert"@de  ;
+	rdfs:seeAlso <http://www.niso.org/schemas/sushi/counterElements4_0.xsd>, <http://www.niso.org/workrooms/sushi/values/> ;
+	rdfs:isDefinedBy <http://vocab.ub.uni-leipzig.de/counter/> .
+
+
+# Item Datatype
+
+counter:Journal
+	a counter:ItemDatatype ;
+	rdfs:label "journal"@en, "Zeitschrift"@de ;
+ 	rdfs:seeAlso <http://www.niso.org/schemas/sushi/counterElements4_0.xsd>, <http://www.niso.org/workrooms/sushi/values/> ;
+	rdfs:isDefinedBy <http://vocab.ub.uni-leipzig.de/counter/> .
+
+counter:Database
+	a counter:ItemDatatype ;
+	rdfs:label "database"@en, "Datenbank"@de ;
+	rdfs:seeAlso <http://www.niso.org/schemas/sushi/counterElements4_0.xsd>, <http://www.niso.org/workrooms/sushi/values/> ;
+	rdfs:isDefinedBy <http://vocab.ub.uni-leipzig.de/counter/> .
+
+counter:Platform
+	a counter:ItemDatatype ;
+	rdfs:label "platform"@en, "Plattform"@de ;
+	rdfs:seeAlso <http://www.niso.org/schemas/sushi/counterElements4_0.xsd>, <http://www.niso.org/workrooms/sushi/values/> ;
+	rdfs:isDefinedBy <http://vocab.ub.uni-leipzig.de/counter/> .
+
+counter:Book
+	a counter:ItemDatatype ;
+	rdfs:label "book"@en, "Buch"@de ;
+	rdfs:seeAlso <http://www.niso.org/schemas/sushi/counterElements4_0.xsd>, <http://www.niso.org/workrooms/sushi/values/> ;
+	rdfs:isDefinedBy <http://vocab.ub.uni-leipzig.de/counter/> .
+
+counter:Collection
+	a counter:ItemDatatype ;
+	rdfs:label "collection"@en, "Sammlung"@de ;
+	rdfs:seeAlso <http://www.niso.org/schemas/sushi/counterElements4_0.xsd>, <http://www.niso.org/workrooms/sushi/values/> ;
+	rdfs:isDefinedBy <http://vocab.ub.uni-leipzig.de/counter/> .
+
+counter:Multimedia
+	a counter:ItemDatatype ;
+	rdfs:label "multimedia"@en, "Multimedia"@de ;
+	rdfs:seeAlso <http://www.niso.org/schemas/sushi/counterElements4_0.xsd>, <http://www.niso.org/workrooms/sushi/values/> ;
+	rdfs:isDefinedBy <http://vocab.ub.uni-leipzig.de/counter/> .					
+	
+
+#Metric type
+
+counter:Journal
+	a counter:ItemDatatype ;
+	rdfs:label "journal"@en, "Zeitschrift"@de ;
+ 	rdfs:seeAlso <http://www.niso.org/schemas/sushi/counterElements4_0.xsd>, <http://www.niso.org/workrooms/sushi/values/> ;
+	rdfs:isDefinedBy <http://vocab.ub.uni-leipzig.de/counter/> .
+
+counter:Database
+	a counter:ItemDatatype ;
+	rdfs:label "database"@en, "Datenbank"@de ;
+	rdfs:seeAlso <http://www.niso.org/schemas/sushi/counterElements4_0.xsd>, <http://www.niso.org/workrooms/sushi/values/> ;
+	rdfs:isDefinedBy <http://vocab.ub.uni-leipzig.de/counter/> .
+
+counter:Platform
+	a counter:ItemDatatype ;
+	rdfs:label "platform"@en, "Plattform"@de ;
+	rdfs:seeAlso <http://www.niso.org/schemas/sushi/counterElements4_0.xsd>, <http://www.niso.org/workrooms/sushi/values/> ;
+	rdfs:isDefinedBy <http://vocab.ub.uni-leipzig.de/counter/> .
+
+counter:Book
+	a counter:ItemDatatype ;
+	rdfs:label "book"@en, "Buch"@de ;
+	rdfs:seeAlso <http://www.niso.org/schemas/sushi/counterElements4_0.xsd>, <http://www.niso.org/workrooms/sushi/values/> ;
+	rdfs:isDefinedBy <http://vocab.ub.uni-leipzig.de/counter/> .
+
+counter:Collection
+	a counter:ItemDatatype ;
+	rdfs:label "collection"@en, "Sammlung"@de ;
+	rdfs:seeAlso <http://www.niso.org/schemas/sushi/counterElements4_0.xsd>, <http://www.niso.org/workrooms/sushi/values/> ;
+	rdfs:isDefinedBy <http://vocab.ub.uni-leipzig.de/counter/> .
+
+counter:Multimedia
+	a counter:ItemDatatype ;
+	rdfs:label "multimedia"@en, "Multimedia"@de ;
+	rdfs:seeAlso <http://www.niso.org/schemas/sushi/counterElements4_0.xsd>, <http://www.niso.org/workrooms/sushi/values/> ;
+	rdfs:isDefinedBy <http://vocab.ub.uni-leipzig.de/counter/> .					
+	
+
+#Metric type
+
+counter:ft_ps
+	a counter:MetricType ;
+	rdfs:label "Full text Postscript"@en, "Volltext Postscript"@de ; 
+	rdfs:comment "postscript file full text requests"@en, "Postscript-Datei Volltextanfragen"@de ;
+	rdfs:seeAlso <http://www.niso.org/workrooms/sushi/reports/> ;
+	rdfs:isDefinedBy <http://vocab.ub.uni-leipzig.de/counter/> .
+
+counter:ft_ps_mobile
+	a counter:MetricType ;
+	rdfs:label "Full text Postscript mobile"@en, "Volltext Postscript mobil"@de ;
+	rdfs:comment "postscript file full text requests, mobile"@en, "Postscript-Datei Volltextanfragen, mobil"@de ;
+	rdfs:seeAlso <http://www.niso.org/schemas/sushi/counterElements4_0.xsd>, <http://www.niso.org/workrooms/sushi/values/> ;
+	rdfs:isDefinedBy <http://vocab.ub.uni-leipzig.de/counter/> . 
+
+counter:ft_pdf
+	a counter:MetricType ;
+	rdfs:label "Full text Pdf"@en, "Volltext Pdf"@de ;
+	rdfs:comment "PDF file full text requests"@en, "PDF-Datei Volltextanfragen"@de ;
+	rdfs:seeAlso <http://www.niso.org/schemas/sushi/counterElements4_0.xsd>, <http://www.niso.org/workrooms/sushi/values/> ;
+	rdfs:isDefinedBy <http://vocab.ub.uni-leipzig.de/counter/> . 
+
+counter:ft_pdf_mobile
+	a counter:MetricType ;
+	rdfs:label "Full text Pdf mobile"@en, "Volltext Pdf mobil"@de ;
+	rdfs:comment "PDF file full text requests, mobile"@en, "PDF-Datei Volltextanfragen, mobil"@de ;
+	rdfs:seeAlso <http://www.niso.org/schemas/sushi/counterElements4_0.xsd>, <http://www.niso.org/workrooms/sushi/values/> ;
+	rdfs:isDefinedBy <http://vocab.ub.uni-leipzig.de/counter/> . 
+
+counter:ft_html
+	a counter:MetricType ;
+	rdfs:label "Full text Html"@en, "Volltext Html"@de ;
+	rdfs:comment "HTML file full text requests"@en, "HTML-Datei Volltextanfragen"@de ;
+	rdfs:seeAlso <http://www.niso.org/schemas/sushi/counterElements4_0.xsd>, <http://www.niso.org/workrooms/sushi/values/> ;
+	rdfs:isDefinedBy <http://vocab.ub.uni-leipzig.de/counter/> .
+
+counter:ft_html_mobile
+	a counter:MetricType ;
+	rdfs:label "Full text Html mobile"@en, "Volltext Html mobil"@de ;
+	rdfs:comment "HTML file full text requests, mobile"@en, "HTML-Datei Volltextanfragen, mobil"@de ;
+	rdfs:seeAlso <http://www.niso.org/schemas/sushi/counterElements4_0.xsd>, <http://www.niso.org/workrooms/sushi/values/> ;
+	rdfs:isDefinedBy <http://vocab.ub.uni-leipzig.de/counter/> . 
+	
+counter:ft_epub
+	a counter:MetricType ;
+	rdfs:label "Full text Epub"@en, "Volltext Epub"@de ;
+	rdfs:comment "ePub file full text requests"@en, "ePub-Datei Volltextanfragen"@de ;
+	rdfs:seeAlso <http://www.niso.org/schemas/sushi/counterElements4_0.xsd>, <http://www.niso.org/workrooms/sushi/values/> ;
+	rdfs:isDefinedBy <http://vocab.ub.uni-leipzig.de/counter/> . 
+	
+counter:sectioned_html	
+	a counter:MetricType ;
+	rdfs:label "Sectioned Html"@en, "Sectioned Html"@de ;
+	rdfs:comment "HTML requests, sectioned. Used in BR2, CR1 and TR1 to differentiate extent of book content delivered."@en, "HTML-Datei-Anfragen, aufgeteilt. Genutzt in BR2, CR1 und TR1 zur Differenzierung des Umfangs des gelieferten Buchinhalts."@de ;
+	rdfs:seeAlso <http://www.niso.org/schemas/sushi/counterElements4_0.xsd>, <http://www.niso.org/workrooms/sushi/values/> ;
+	rdfs:isDefinedBy <http://vocab.ub.uni-leipzig.de/counter/> .
+	
+counter:ft_total	
+	a counter:MetricType ;
+	rdfs:label "Full text total"@en, "Volltext Summe"@de ;
+	rdfs:comment "full text requests total"@en, "Volltextanfragen gesamt"@de  ;
+	rdfs:seeAlso <http://www.niso.org/schemas/sushi/counterElements4_0.xsd>, <http://www.niso.org/workrooms/sushi/values/> ;
+	rdfs:isDefinedBy <http://vocab.ub.uni-leipzig.de/counter/> .
+	
+counter:toc
+	a counter:MetricType ;
+	rdfs:label "Table of Content"@en, "Inhaltsverzeichnis"@de ;
+	rdfs:comment "table of content requests"@en, "Anfragen nach Inhaltsverzeichnis"@de ;
+	rdfs:seeAlso <http://www.niso.org/schemas/sushi/counterElements4_0.xsd>, <http://www.niso.org/workrooms/sushi/values/> ;
+	rdfs:isDefinedBy <http://vocab.ub.uni-leipzig.de/counter/> . 
+	
+counter:abstract
+	a counter:MetricType ;
+		rdfs:label "Abstract"@en, "Abstract"@de ;
+	rdfs:comment "abstract requests"@en, "Anfragen nach Abstract"@de ;
+	rdfs:seeAlso <http://www.niso.org/schemas/sushi/counterElements4_0.xsd>, <http://www.niso.org/workrooms/sushi/values/> ;
+	rdfs:isDefinedBy <http://vocab.ub.uni-leipzig.de/counter/> . 
+	
+counter:reference
+	a counter:MetricType ;
+	rdfs:label "Reference"@en, "Reference"@de ;
+	rdfs:comment "Reference requests. Views to bibliographic references pages associated with an article."@en, "Anfragen nach bibliographischen Metadaten. Anzeigen von Seiten mit bibliographischen Metadaten, die mit einem Artikel in Verbindung stehen."@de ;
+	rdfs:seeAlso <http://www.niso.org/schemas/sushi/counterElements4_0.xsd>, <http://www.niso.org/workrooms/sushi/values/> ;
+	rdfs:isDefinedBy <http://vocab.ub.uni-leipzig.de/counter/> .
+
+counter:data_set
+	a counter:MetricType ;
+	rdfs:label "Data set"@en, "Data set"@de ;
+	rdfs:comment "Data set requests. Requests for supplementary data sets referenced in an article"@en, "Anfragen nach Zusatzdaten. Anfragen nach in einem Artikel erwähnten ergänzenden Datensets."@de ;
+	rdfs:seeAlso <http://www.niso.org/schemas/sushi/counterElements4_0.xsd>, <http://www.niso.org/workrooms/sushi/values/> ;
+	rdfs:isDefinedBy <http://vocab.ub.uni-leipzig.de/counter/> .
+	
+counter:audio
+	a counter:MetricType ;
+	rdfs:label "Audio"@en, "Audio"@de ;
+	rdfs:comment "Requests for audio clips referenced in an article"@en, "Anfragen nach in einem Artikel erwähnten Audios."@de ;
+	rdfs:seeAlso <http://www.niso.org/schemas/sushi/counterElements4_0.xsd>, <http://www.niso.org/workrooms/sushi/values/> ;
+	rdfs:isDefinedBy <http://vocab.ub.uni-leipzig.de/counter/> .
+	
+counter:video
+	a counter:MetricType ;
+	rdfs:label "Video"@en, "Video"@de ;
+	rdfs:comment "Requests for video clips referenced in an article"@en, "Anfragen nach in einem Artikel erwähnten Videos"@de ;
+	rdfs:seeAlso <http://www.niso.org/schemas/sushi/counterElements4_0.xsd>, <http://www.niso.org/workrooms/sushi/values/> ;
+	rdfs:isDefinedBy <http://vocab.ub.uni-leipzig.de/counter/> .
+	
+counter:image
+	a counter:MetricType ;
+	rdfs:label "Image"@en, "Image"@de ;
+	rdfs:comment "Requests for images referenced in an article"@en, "Anfragen nach in einem Artikel erwähnten Bildern"@de ;
+	rdfs:seeAlso <http://www.niso.org/schemas/sushi/counterElements4_0.xsd>, <http://www.niso.org/workrooms/sushi/values/> ;
+	rdfs:isDefinedBy <http://vocab.ub.uni-leipzig.de/counter/> .
+
+counter:podcast
+	a counter:MetricType ;
+	rdfs:label "Podcast"@en, "Podcast"@de ;
+	rdfs:comment "Requests for podcasts referenced in an article"@en, "Anfragen nach in einem Artikel erwähnten Podcasts"@de ;
+	rdfs:seeAlso <http://www.niso.org/schemas/sushi/counterElements4_0.xsd>, <http://www.niso.org/workrooms/sushi/values/> ;
+	rdfs:isDefinedBy <http://vocab.ub.uni-leipzig.de/counter/> .
+
+counter:multimedia
+	a counter:MetricType ;
+	rdfs:label "Multimedia"@en, "Multimedia"@de ;
+	rdfs:comment "Multimedia requests. Includes audio, video, image, podcast and other non-textual content items."@en, "Anfragen nach Multimedia. Beinhaltet Audios, Videos, Bilder, Podcasts und andere nichttextuelle Elemente."@de ;
+	rdfs:seeAlso <http://www.niso.org/schemas/sushi/counterElements4_0.xsd>, <http://www.niso.org/workrooms/sushi/values/> ;
+	rdfs:isDefinedBy <http://vocab.ub.uni-leipzig.de/counter/> .
+	
+counter:record_view
+	a counter:MetricType ;
+	rdfs:label "Record view"@en, "Record View"@de ;
+	rdfs:comment "Detailed record-views for a database"@en, "Detaillierte Artikelansichten in einer Datenbank"@de ;
+	rdfs:seeAlso <http://www.niso.org/schemas/sushi/counterElements4_0.xsd>, <http://www.niso.org/workrooms/sushi/values/> ;
+	rdfs:isDefinedBy <http://vocab.ub.uni-leipzig.de/counter/> .
+	
+counter:result_click
+	a counter:MetricType ;
+	rdfs:label "Result click"@en, "Result Klick"@de ;
+	rdfs:comment "Search result clicks. Clicks originating from a database search result list"@en, "Klicks auf Suchergebnis. Klicks, die aus einer Ergebnisliste einer Datenbanksuche resultieren"@de ;
+	rdfs:seeAlso <http://www.niso.org/schemas/sushi/counterElements4_0.xsd>, <http://www.niso.org/workrooms/sushi/values/> ;
+	rdfs:isDefinedBy <http://vocab.ub.uni-leipzig.de/counter/> .								
+	
+counter:search_reg
+	a counter:MetricType ;
+	rdfs:label "Seach regular"@en, "Suche regulär"@de ;
+	rdfs:comment "Regular searches as conducted by users (excludes searches attributed to automated search processes and federated searches)"@en, "Reguläre, von Nutzern ausgeführte Suchvorgänge. Schließt automatisierte Suchen und Federated Searches aus."@de ;
+	rdfs:seeAlso <http://www.niso.org/schemas/sushi/counterElements4_0.xsd>, <http://www.niso.org/workrooms/sushi/values/> ;
+	rdfs:isDefinedBy <http://vocab.ub.uni-leipzig.de/counter/> .
+	
+counter:search_fed
+	a counter:MetricType ;
+	rdfs:label "Search federated"@en, "Suche verteilt"@de ;
+	rdfs:comment "Searches conducted by federated search or automated search processes"@en, "Automatisierte Suchprozesse und Federated (=verteilte) Searches."@d ;
+	rdfs:seeAlso <http://www.niso.org/schemas/sushi/counterElements4_0.xsd>, <http://www.niso.org/workrooms/sushi/values/> ;
+	rdfs:isDefinedBy <http://vocab.ub.uni-leipzig.de/counter/> .
+	
+counter:turnaway
+	a counter:MetricType ;
+	rdfs:label "Turnaway"@en, "Abweisung"@de ;
+	rdfs:comment "turnaways because simultaneous user limit exceeded"@en, "Abweisung wegen überschrittener Höchstzahl simultaner Nutzer"@de ;
+	rdfs:seeAlso <http://www.niso.org/schemas/sushi/counterElements4_0.xsd>, <http://www.niso.org/workrooms/sushi/values/> ;
+	rdfs:isDefinedBy <http://vocab.ub.uni-leipzig.de/counter/> .
+	
+counter:no_license
+	a counter:MetricType ;
+	rdfs:label "No license"@en, "Keine Lizenz"@de ;
+	rdfs:comment "Denied access because not licensed to access content"@en, "Abweisungen wegen nicht vorhandener Lizenz"@de ;
+	rdfs:seeAlso <http://www.niso.org/schemas/sushi/counterElements4_0.xsd>, <http://www.niso.org/workrooms/sushi/values/> ;
+	rdfs:isDefinedBy <http://vocab.ub.uni-leipzig.de/counter/> .
+
+counter:other
+	a counter:MetricType ;
+	rdfs:label "Other"@en, "Andere"@de ;
+	rdfs:comment "acces denied, other reason "@en, "Abweisung, anderer Grund"@de ;
+	rdfs:seeAlso <http://www.niso.org/schemas/sushi/counterElements4_0.xsd>, <http://www.niso.org/workrooms/sushi/values/> ;
+	rdfs:isDefinedBy <http://vocab.ub.uni-leipzig.de/counter/> . 
+	
+	
+	
+#ReportName
+	
+counter:BR1
+	a counter:ReportTitle ;
+	rdfs:label "BR1, Book Report 1"@en, "BR1, Book Report 1"@de ;
+	rdfs:comment "Number of successful title requests by month and title."@en, "Zahl der erfolgreichen Titelanfragen nach Monat und Titel."@de ;
+	rdfs:seeAlso <http://www.niso.org/workrooms/sushi/reports/> ;
+	rdfs:isDefinedBy <http://vocab.ub.uni-leipzig.de/counter/> ;
+	counter:hasFullTitle "Book Report 1" .
+	
+counter:BR2
+	a counter:ReportTitle ;
+	rdfs:label "BR2, Book Report 2"@en, "BR2, Book Report 2"@de ;
+	rdfs:comment "Number of successful section requests by month and title."@en, "Zahl der erfolgreichen Abschnittsanfragen nach Monat und Titel."@de ;
+	rdfs:seeAlso <http://www.niso.org/workrooms/sushi/reports/> ;
+	rdfs:isDefinedBy <http://vocab.ub.uni-leipzig.de/counter/> ;
+	counter:hasFullTitle "Book Report 2" .
+	
+counter:BR3
+	a counter:ReportTitle ;
+	rdfs:label "BR3, Book Report 3"@en, "BR3, Book Report 3"@de ;
+	rdfs:comment "Access denied to content items by month, title, and category."@en, "Zahl der Abwesiungen nach Monat, Titel und Kategorie."@de ;
+	rdfs:seeAlso <http://www.niso.org/workrooms/sushi/reports/> ;
+	rdfs:isDefinedBy <http://vocab.ub.uni-leipzig.de/counter/> ;
+	counter:hasFullTitle "Book Report 3" .
+
+counter:BR4
+	a counter:ReportTitle ;
+	rdfs:label "BR4, Book Report 4"@en, "BR4, Book Report 4"@de ;
+	rdfs:comment "Access denied to content items by month, platform, and category"@en, "Zahl der Abwesiungen nach Monat, Platform und Kategorie."@de ;
+	rdfs:seeAlso <http://www.niso.org/workrooms/sushi/reports/> ;
+	rdfs:isDefinedBy <http://vocab.ub.uni-leipzig.de/counter/> ;
+	counter:hasFullTitle "Book Report 4" .
+
+counter:BR5
+	a counter:ReportTitle ;
+	rdfs:label "BR5, Book Report 5"@en, "BR5, Book Report 5"@de ;
+	rdfs:comment "Total searches by month and title."@en, "Gesamtzahl der Suchvorgänge nach Monat und Titel."@de ;
+	rdfs:seeAlso <http://www.niso.org/workrooms/sushi/reports/> ;
+	rdfs:isDefinedBy <http://vocab.ub.uni-leipzig.de/counter/> ;
+	counter:hasFullTitle "Book Report 5" .
+
+counter:CR1
+	a counter:ReportTitle ;
+	rdfs:label "CR1, Consortium Report 1"@en, "CR1, Consortium Report 1"@de ;
+	rdfs:comment "Number of successful full-text journal article or book chapter requests by month."@en, "Zahl der erfolgreichen Volltext-Zeitschriftenartikel- oder Buchkapitelanfragen nach Monat."@de ;
+	rdfs:seeAlso <http://www.niso.org/workrooms/sushi/reports/> ;
+	rdfs:isDefinedBy <http://vocab.ub.uni-leipzig.de/counter/> ;
+	counter:hasFullTitle "Consortium Report 1" .
+	
+counter:CR2
+	a counter:ReportTitle ;
+	rdfs:label "CR2, Consortium Report 2"@en, "CR2, Consortium Report 2"@de ;
+	rdfs:comment "Total searches by month and database."@en, "Gesamtzahl der Suchvorgänge nach Monat und Datenbank."@de ;
+	rdfs:seeAlso <http://www.niso.org/workrooms/sushi/reports/> ;
+	rdfs:isDefinedBy <http://vocab.ub.uni-leipzig.de/counter/> ;
+	counter:hasFullTitle "Consortium Report 2" .
+
+counter:CR3
+	a counter:ReportTitle ;
+	rdfs:label "CR3, Consortium Report 3"@en, "CR3, Consortium Report 3"@de ;
+	rdfs:comment "Number of successful multimedia full content unit requests by month and collection."@en, "Zahl der erfolgreichen Anfragen nach Vollzugriffen auf Multimediaeinheiten nach Monat und Sammlung."@de ;
+	rdfs:seeAlso <http://www.niso.org/workrooms/sushi/reports/> ;
+	rdfs:isDefinedBy <http://vocab.ub.uni-leipzig.de/counter/> ;
+	counter:hasFullTitle "Consortium Report 3" .
+
+counter:DB1
+	a counter:ReportTitle ;
+	rdfs:label "DB1, Database Report 1"@en, "DB1, Database Report 1"@de ;
+	rdfs:comment "Total searches, result clicks, and record views by month and database."@en, "Gesamtzahl der Suchvorgänge, Klicks auf Suchergebnisse und Artikelzugriffe nach Monat und Datenbank."@de ;
+	rdfs:seeAlso <http://www.niso.org/workrooms/sushi/reports/> ;
+	rdfs:isDefinedBy <http://vocab.ub.uni-leipzig.de/counter/> ;
+	counter:hasFullTitle "Database Report 1" .
+	
+counter:DB2
+	a counter:ReportTitle ;
+	rdfs:label "DB2, Database Report 2"@en, "DB2, Database Report 2"@de ;
+	rdfs:comment "Access denied by month, database, and category."@en, "Zahl der Abweisungen nach Monat, Datenbank und Kategrie."@de ;
+	rdfs:seeAlso <http://www.niso.org/workrooms/sushi/reports/> ;
+	rdfs:isDefinedBy <http://vocab.ub.uni-leipzig.de/counter/> ;
+	counter:hasFullTitle "Database Report 2" .
+
+counter:JR1
+	a counter:ReportTitle ;
+	rdfs:label "JR1, Journal Report 1"@en, "JR1, Journal Report 1"@de ;
+	rdfs:comment "Number of successful full text article requests by month and journal."@en, "Zahl der erfolgreichen Volltext-Artikelanfragen nach Monat und Zeitschrift."@de ;
+	rdfs:seeAlso <http://www.niso.org/workrooms/sushi/reports/> ;
+	rdfs:isDefinedBy <http://vocab.ub.uni-leipzig.de/counter/> ;
+	counter:hasFullTitle "Journal Report 1" .
+	
+counter:JR1GOA				a counter:ReportTitle ;
+	rdfs:label "JR1GOA, Journal Report 1 GOA"@en, "JR1GOA, Journal Report 1 GOA"@de ;
+	rdfs:comment "Number of successful Gold Open Access full text article requests by month and journal."@en, "Zahl der erfolgreichen Gold Open Access Volltext-Artikelanfragen nach Monat und Zeitschrift."@de ;
+	rdfs:seeAlso <http://www.niso.org/workrooms/sushi/reports/> ;
+	rdfs:isDefinedBy <http://vocab.ub.uni-leipzig.de/counter/> ;
+	counter:hasFullTitle "Journal Report 1 GOA" .
+	
+counter:JR1a
+	a counter:ReportTitle ;
+	rdfs:label "JR1a, Journal Report 1a"@en, "JR1a, Journal Report 1a"@de ;
+	rdfs:comment "Number of successful full text article requests from an archive by month and journal."@en, "Zahl der erfolgreichen Volltext-Artikelanfragen aus einem Archiv nach Monat und Zeitschrift."@de ;
+	rdfs:seeAlso <http://www.niso.org/workrooms/sushi/reports/> ;
+	rdfs:isDefinedBy <http://vocab.ub.uni-leipzig.de/counter/> ;
+	counter:hasFullTitle "Journal Report 1a" .
+	
+counter:JR2
+	a counter:ReportTitle ;
+	rdfs:label "JR2, Journal Report 2"@en, "JR2, Journal Report 2"@de ;
+	rdfs:comment "Access denied to full text articles by month, journal, and category."@en, "Zahl der Abwesiungen zu Volltextartikeln nach Monat, Zeitschrift und Kategorie."@de ;
+	rdfs:seeAlso <http://www.niso.org/workrooms/sushi/reports/> ;
+	rdfs:isDefinedBy <http://vocab.ub.uni-leipzig.de/counter/> ;
+	counter:hasFullTitle "Journal Report 2" .
+	
+counter:JR3
+	a counter:ReportTitle ;
+	rdfs:label "JR3, Journal Report 3"@en, "JR3, Journal Report 3"@de ;
+	rdfs:comment "Number of successful item requests and turnaways by month, journal, and page-type."@en, "Zahl der erfolgreichen Item-Anfragen und Abweisungen nach Monat, Zeitschrift und page-type."@de ;
+	rdfs:seeAlso <http://www.niso.org/workrooms/sushi/reports/> ;
+	rdfs:isDefinedBy <http://vocab.ub.uni-leipzig.de/counter/> ;
+	counter:hasFullTitle "Journal Report 3" .
+	
+counter:JR3mobile
+	a counter:ReportTitle ;
+	rdfs:label "JR3mobile, Journal Report 3 Mobile"@en, "JR3mobile, Journal Report 3 Mobile"@de ;
+	rdfs:comment "Number of successful item requests by month, journal, and page-type for usage on a mobile device."@en, "Zahl der erfolgreichen item-Anfragen nach Monat, Zeitschrift und page-type, mobile Version."@de ;
+	rdfs:seeAlso <http://www.niso.org/workrooms/sushi/reports/> ;
+	rdfs:isDefinedBy <http://vocab.ub.uni-leipzig.de/counter/> ;
+	counter:hasFullTitle "Journal Report 3 Mobile" .								
+	
+counter:JR4
+	a counter:ReportTitle ;
+	rdfs:label "JR4, Journal Report 4"@en, "JR4, Journal Report 4"@de ;
+	rdfs:comment "Total searches run by month and collection."@en, "Gesamtzahl der Suchvorgänge nach Monat und Sammlung."@de ;
+	rdfs:seeAlso <http://www.niso.org/workrooms/sushi/reports/> ;
+	rdfs:isDefinedBy <http://vocab.ub.uni-leipzig.de/counter/> ;
+	counter:hasFullTitle "Journal Report 4" .
+	
+counter:JR5
+	a counter:ReportTitle ;
+	rdfs:label "JR5, Journal Report 5"@en, "JR5, Journal Report 5"@de ;
+	rdfs:comment "Number of successful full text article requests by year-of-publication (YOP) and journal."@en, "Zahl der erfolgreichen Volltext-Artikelanfragen nach Publikationsjahr und Zeitschrift."@de ;
+	rdfs:seeAlso <http://www.niso.org/workrooms/sushi/reports/> ;
+	rdfs:isDefinedBy <http://vocab.ub.uni-leipzig.de/counter/> ;
+	counter:hasFullTitle "Journal Report 5" .
+	
+counter:MR1
+	a counter:ReportTitle ;
+	rdfs:label "MR1, Multimedia Report 1"@en, "MR1, Multimedia Report 1"@de ;
+	rdfs:comment "Number of successful multimedia full content unit requests by month and collection."@en, "Zahl der erfolgreichen Anfragen nach Vollzugriffen auf Multimediaeinheiten nach Monat und Sammlung."@de ;
+	rdfs:seeAlso <http://www.niso.org/workrooms/sushi/reports/> ;
+	rdfs:isDefinedBy <http://vocab.ub.uni-leipzig.de/counter/> ;
+	counter:hasFullTitle "Multimedia Report 1" .
+	
+counter:MR2
+	a counter:ReportTitle ;
+	rdfs:label "MR2, Multimedia Report 2"@en, "MR2, Multimedia Report 2"@de ;
+	rdfs:comment "Number of successful multimedia full content unit requests by month, collection, and item type."@en, "Zahl der erfolgreichen Anfragen nach Vollzugriffen auf Multimediaeinheiten nach Monat, Sammlung und Item type."@de ;
+	rdfs:seeAlso <http://www.niso.org/workrooms/sushi/reports/> ;
+	rdfs:isDefinedBy <http://vocab.ub.uni-leipzig.de/counter/> ;
+	counter:hasFullTitle "Multimedia Report 2" .
+	
+counter:PR1
+	a counter:ReportTitle ;
+	rdfs:label "PR1, Platform Report 1"@en, "PR1, Platform Report 1"@de ;
+	rdfs:comment "Total searches, result clicks, and record views by month and platform."@en, "Gesamtzahl der Suchvorgänge, Klicks auf Suchergebnisse und Artikelzugriffe nach Monat und Plattform."@de ;
+	rdfs:seeAlso <http://www.niso.org/workrooms/sushi/reports/> ;
+	rdfs:isDefinedBy <http://vocab.ub.uni-leipzig.de/counter/> ;
+	counter:hasFullTitle "Platform Report 1" .
+	
+counter:TR1
+	a counter:ReportTitle ;
+	rdfs:label "TR1, Title Report 1"@en, "TR1, Title Report 1"@de ;
+	rdfs:comment "Number of successful requests for journal full text Articles and book sections by month and title."@en, "Zahl der erfolgreichen Volltext-Zeitschriftenartikel- oder Buchkapitelanfragen nach Monat und Titel."@de ;
+	rdfs:seeAlso <http://www.niso.org/workrooms/sushi/reports/> ;
+	rdfs:isDefinedBy <http://vocab.ub.uni-leipzig.de/counter/> ;
+	counter:hasFullTitle "Title Report 1" .
+
+counter:TR1mobile
+	a counter:ReportTitle ;
+	rdfs:label "TR1mobile, Title Report 1 Mobile"@en, "TR1mobile, Title Report 1 Mobile"@de ;
+	rdfs:comment "Number of successful requests for journal full text Articles and book sections by month and title (formatted for normal browsers/delivered to mobile devices AND formatted for mobile devices/delivered to mobile devices)."@en, "Zahl der erfolgreichen Volltext-Zeitschriftenartikel- oder Buchkapitelanfragen nach Monat und Titel (für normale Browser formatiert/auf mobilem Endgerät angezeigt UND dafür formatiert/auf mobilem Endgerät angezeigt)."@de ;
+	rdfs:seeAlso <http://www.niso.org/workrooms/sushi/reports/> ;
+	rdfs:isDefinedBy <http://vocab.ub.uni-leipzig.de/counter/> ;
+	counter:hasFullTitle "Title Report 1 Mobile" .							
+
+counter:TR2
+	a counter:ReportTitle ;
+	rdfs:label "TR2, Title Report 2"@en, "TR2, Title Report 2"@de ;
+	rdfs:comment "Access denied to full text Items by month, title, and category."@en, "Zahl der Abweisungen zu Volltext-Items nach Monat, Titel und Kategorie."@de ;
+	rdfs:seeAlso <http://www.niso.org/workrooms/sushi/reports/> ;
+	rdfs:isDefinedBy <http://vocab.ub.uni-leipzig.de/counter/> ;
+	counter:hasFullTitle "Title Report 2" .
+
+counter:TR3
+	a counter:ReportTitle ;
+	rdfs:label "TR3, Title Report 3"@en, "TR3, Title Report 3"@de ;
+	rdfs:comment "Number of successful item requests by month, title, and page-type."@en, "Zahl der erfolgreichen Item-Anfragen nach Monat, Titel und page-type."@de ;
+	rdfs:seeAlso <http://www.niso.org/workrooms/sushi/reports/> ;
+	rdfs:isDefinedBy <http://vocab.ub.uni-leipzig.de/counter/> ;
+	counter:hasFullTitle "Title Report 3" .							
+
+counter:TR3mobile
+	a counter:ReportTitle ;
+	rdfs:label "TR3mobile, Title Report 3 Mobile"@en, "TR3mobile, Title Report 3 Mobile"@de ;
+	rdfs:comment "Number of successful item requests by month, title, and page-type (formatted for normal browsers/delivered to mobile devices And formatted for mobile devices/delivered to mobile devices)."@en, "Item-Anfragen nach Monat, Titel und page-type (für normale Browser formatiert/auf mobilem Endgerät angezeigt UND dafür formatiert/auf mobilem Endgerät angezeigt)."@de ;
+	rdfs:seeAlso <http://www.niso.org/workrooms/sushi/reports/> ;
+	rdfs:isDefinedBy <http://vocab.ub.uni-leipzig.de/counter/> ;
+	counter:hasFullTitle "Title Report 3 Mobile" .
+
+	
